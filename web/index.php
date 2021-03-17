@@ -270,7 +270,8 @@ else { //if the form hasn't yet been submitted
 	//print the boxes and labels for the user to select what she wants removed.
 	print_inputs($remove_these);
 
-	echo '
+  echo '
+        <br>
 				<label for="custom_cats" id="text">Enter additional categories to exclude below; separate with commas.
 					<input type="text" name="custom_cats" id="custom_cats" />
 				</label>
