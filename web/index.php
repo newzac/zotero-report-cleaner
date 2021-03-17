@@ -1,31 +1,8 @@
 <?php
 /****************************************************************************************************************
 ## Zotero report customizer
-## By Jason Priem
-## http://jasonpriem.com/?page_id=7
-## Feel free to use or improve upon anything here.  I'm new to programming, so I'd love to hear any suggestions.
+## Originally By Jason Priem
 ## License: MIT License, http://www.opensource.org/licenses/mit-license.php
-
-Changelog:
-16 May, 2008	1.0
-21 Aug, 2008	1.5		-got rid of extra code for sorting report
-						-added regexes to remove abstract, pages, ISBN, short title, call number, and repository
-						-modified user form: inputs in columns, checked items to default replace
-						-licensed under MIT License
-						-moved google analytics info so it's not in the generated report
-						
-25 Aug, 2008	2.0		-improved readability: condensed CSS; moved most of the php together.
-						-replaced list of regular expressions with list of category names (easier to edit)
-						-replace hard-coded form with form dynamically generated from categories (easier to add categories)
-						-allow removal of multiple localizations of category names, all linked to one user selection;
-						 	the same script can customize reports in multiple languages
-						-let users enter additional categories to remove.
-						-added basic support for German-localized reports.
-						-replaced php report-source validation with javascript validation
-						-added 'select all' javascript link to checkboxes
-
-19 Dec, 2012 2.01 -moved source code to GitHub, note that I'm no longer adding new features.
-
 ****************************************************************************************************************/
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -115,7 +92,7 @@ Changelog:
 	form span {font-size:3em;color:#cc0000; margin-right:20px;}
 	form #submit {display:block; font-size:1.2em; margin-bottom:100px;}
 	form #submit-error {background:#cc0000; border: 1px solid #333; color:#eee; font-size: 1.3em; padding: 10px; }
-	
+
 	h1 {font-size:4em; color:#cc0000;}
 	#intro {border:1px solid #cc0000;background:#ddd;}
 	#intro p {font-size:1.7em; padding-left:30px; padding-right:30px;}
@@ -160,31 +137,31 @@ This is the primary list of categories to remove.  To localize in another langua
 with one in the language you want.  You can also add or remove categories by adding or removing from this list
 ---------------------------------------------------------------------------------------------------------------*/
 $remove_these = array(
-		'Type', 
-		'URL', 
-		'Date Added', 
-		'Modified', 
-		'tags', 
-		'attachments', 
-		'notes', 
-		'Abstract', 
+		'Type',
+		'URL',
+		'Date Added',
+		'Modified',
+		'tags',
+		'attachments',
+		'notes',
+		'Abstract',
 		'Pages',
-		'ISBN', 
-		'ISSN', 
-		'Short Title', 
-		'Call Number', 
-		'Repository', 
-		'Signature', 
-		'Language', 
+		'ISBN',
+		'ISSN',
+		'Short Title',
+		'Call Number',
+		'Repository',
+		'Signature',
+		'Language',
 		'related'
 		);
 
 /*----------------------------------------------------------------------------------------------------------------
-The categories below are linked to the primary ones in the $remove_these array above, so that if users select a 
+The categories below are linked to the primary ones in the $remove_these array above, so that if users select a
 certain category above, a second value specified here will be removed as well, like this:
 'Category from $remove_these' => 'a category that will ALSO be removed if this is selected'
 
-This is useful for when you're not sure what language a particluar category will be expressed in.	
+This is useful for when you're not sure what language a particluar category will be expressed in.
 You can add any number of extra categories here; just be sure to use the exact same
 spelling and capitalization for the in the key of this array as is used in the $remove_these array.
 ------------------------------------------------------------------------------------------------------------------*/
@@ -193,11 +170,11 @@ $other_category_names = array(
 		'Date Added'=>'hinzugefügt am'
 		);
 
-		
+
 ////////////////// functions //////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-//adds alternate category names to the $remove_these array	
+//adds alternate category names to the $remove_these array
 function load_other_category_names($new_labels_arr, $remove_these) {
 	foreach ($new_labels_arr as $old_label => $new_label) {
 		if ($remove_these[str_ireplace(' ', '_', $old_label)]) {
@@ -210,7 +187,7 @@ function load_other_category_names($new_labels_arr, $remove_these) {
 //adds user-supplied categories to the $remove_these array
 function load_custom_cats($custom_cats_str, $remove_these) {
 	$punctuation = array( //very basic validation
-				'\'', '"', '\\', '/', '.', '!', '@', '#', '$', '%', '&', 
+				'\'', '"', '\\', '/', '.', '!', '@', '#', '$', '%', '&',
 				':', ';', '{', '}', '(', ')', '_', '+', '='
 				);
 	$cleaned_str = str_replace($punctuation, '', $custom_cats_str);
@@ -223,14 +200,14 @@ function load_custom_cats($custom_cats_str, $remove_these) {
 }
 
 
-	
+
 //removes data categories based on user input from the preferences form.
 function customize_text($text, $remove_these) {
-	
+
 	//this loop checks the form for which data to exclude, then runs both regexes.
-	//this method isn't great in terms of performance, but it's extensible, and we're not generally dealing 
+	//this method isn't great in terms of performance, but it's extensible, and we're not generally dealing
 	//with a huge amount of text here.
-	
+
 	foreach ($remove_these as $word => $v) {
 		$tr_regex = '/<tr>\s*<th[^>]*>' . str_ireplace('_', ' ', $word) . '<\/th>(.+?)<\/tr>/is';
 		$h3_regex = '/<h3 class="' . str_ireplace('_', ' ', $word) . '">(.+?)<\/ul>/is';
@@ -245,11 +222,11 @@ function customize_text($text, $remove_these) {
 function print_inputs($remove_these) {
 	foreach ($remove_these as $k => $word) {
 		$word_no_space = str_replace(' ', '_', $word);
-		echo "<label for=\"$word_no_space\" class=\"category\"><input type=\"checkbox\" name=\"cat[$word_no_space]"; 
+		echo "<label for=\"$word_no_space\" class=\"category\"><input type=\"checkbox\" name=\"cat[$word_no_space]";
 		echo "\" id=\"$word_no_space\" />$word</label>\n";
 	}
 }
-	
+
 
 ///////////////// input and output ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -258,13 +235,13 @@ if (isset($_POST['submitted'])) { //if the form has been submitted
 
 	$prepared_html = stripslashes($_POST['orig']);
 	$remove_these = $_POST['cat'];
-	
+
 	$remove_these = load_custom_cats($_POST['custom_cats'], $remove_these); // include user-entered categories
 	$remove_these = load_other_category_names($other_category_names, $remove_these); //include alternate category names
 	$customized = customize_text($prepared_html, $remove_these); //remove the categories
 	echo $customized;
 
-	
+
 }
 
 else { //if the form hasn't yet been submitted
@@ -275,10 +252,8 @@ else { //if the form hasn't yet been submitted
 	<h1>Zotero Report Customizer</h1>
 	<div id="intro">
 		<p>Zotero\'s reports are very useful, but they are unfortunately a bit inflexible.  So, I hacked together a script to give me a little more control. In addition to letting you modify the data included, it also inserts all the styling as inline CSS, so you can send a colleague your pretty report without having to include seperate stylesheet files.</p>
-		<p><em>Dec. 2012 update:</em>I\'d love to keep adding features on this, but I\'m currently working on a PhD and co-founding a <a href="http://impactstory.org">startup</a>, and the time just ain\'t there. However, feel free to fork it on <a href="https://github.com/jasonpriem/zotero-report-cleaner">GitHub</a> and hack away; I\'m happy to pull in new features, or of course you can just run your own version somewhere.</p>
-
 	</div>
-	
+
 	<form action="report_cleaner.php" method="post" onsubmit="return checkReportSource(this, \'paste-here\')">
 		<fieldset>
 			<p><span class="step">1:</span>Copy your Zotero report\'s <strong>HTML source code</strong> to your clipboard (you can view the source code of a page by pressing [CTRL+U] or selecting View -> Page Source).</p>
@@ -291,24 +266,24 @@ else { //if the form hasn't yet been submitted
 					<a id="select-all" href="#" onclick="selectAll(this);return false;">Select all</a>
 				</div>
 	';
-	
+
 	//print the boxes and labels for the user to select what she wants removed.
 	print_inputs($remove_these);
-	
+
 	echo '
-				<label for="custom_cats" id="text">Enter additional categories to exclude below; separate with commas. 
+				<label for="custom_cats" id="text">Enter additional categories to exclude below; separate with commas.
 					<input type="text" name="custom_cats" id="custom_cats" />
 				</label>
 
 			</fieldset>
-			
-			
+
+
 			<fieldset>
 				<legend>How you want your report items sorted?</legend>
 				<p><em>update:</em> I found out that there\'s a actually a way to do this in Zotero; you need to append specific values to the url of the report.  You can find instructions in the Zotero  <a href="http://www.zotero.org/documentation/reports">documentation</a>.</p>
 			</fieldset>
 		</fieldset>
-		
+
 		<fieldset>
 			<label for="orig-report" style="display:block" id="paste-here"><span class="step">3:</span>Paste your report\'s source code here:</label>
 			<textarea id="orig-report" name="orig" cols="75" rows= "25"></textarea>
